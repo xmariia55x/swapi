@@ -7,7 +7,7 @@ import pytest
 from flask import Flask
 from use_cases.get_people import GetPeopleUseCase
 from repositories.people_repository import PeopleRepository
-from controllers.people_controller import app as flask_app
+from main import app as flask_app
 from entities.person import Person
 import json
 
@@ -62,7 +62,7 @@ def test_get_sorted_people_page_1(client, monkeypatch):
     monkeypatch.setattr('controllers.people_controller.PeopleRepository', MockPeopleRepository)
     monkeypatch.setattr('controllers.people_controller.GetPeopleUseCase', MockGetPeopleUseCase)
 
-    response = client.get('/data?page=1')
+    response = client.get('/people/data?page=1')
     assert response.status_code == 200
 
     data = json.loads(response.data)
@@ -75,7 +75,7 @@ def test_get_sorted_people_page_2(client, monkeypatch):
     monkeypatch.setattr('controllers.people_controller.PeopleRepository', MockPeopleRepository)
     monkeypatch.setattr('controllers.people_controller.GetPeopleUseCase', MockGetPeopleUseCase)
 
-    response = client.get('/data?page=2')
+    response = client.get('/people/data?page=2')
     assert response.status_code == 200
 
     data = json.loads(response.data)
@@ -87,7 +87,7 @@ def test_get_all_people(client, monkeypatch):
     monkeypatch.setattr('controllers.people_controller.PeopleRepository', MockPeopleRepository)
     monkeypatch.setattr('controllers.people_controller.GetPeopleUseCase', MockGetPeopleUseCase)
 
-    response = client.get('/data?all=true')
+    response = client.get('/people/data?all=true')
     assert response.status_code == 200
 
     data = json.loads(response.data)
@@ -101,7 +101,7 @@ def test_get_sorted_people_no_params(client, monkeypatch):
     monkeypatch.setattr('controllers.people_controller.PeopleRepository', MockPeopleRepository)
     monkeypatch.setattr('controllers.people_controller.GetPeopleUseCase', MockGetPeopleUseCase)
 
-    response = client.get('/data')
+    response = client.get('/people/data')
     assert response.status_code == 200
 
     data = json.loads(response.data)
