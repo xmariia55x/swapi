@@ -10,6 +10,10 @@ people = Blueprint("people", __name__)
 def serialize_data(data):
     return data.__dict__
 
+@people.route('/', methods=['GET'])
+def get_status():
+    return jsonify({"message": "Flask app up and running"})
+
 @people.route('/data', methods=['GET'])
 def get_sorted_people():
     # Get URL params: page and all
