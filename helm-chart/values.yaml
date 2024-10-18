@@ -1,0 +1,16 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/xmariia55x/star-wars-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  enabled: true
+  name: star-wars-api
+  type: ClusterIP
+  port: 5000
+  targetPort: 5000
+
+env:
+  API_URL: "https://swapi.dev/api"
