@@ -32,10 +32,24 @@ jobs:
       - name: Lint code using MegaLinter
         uses: oxsecurity/megalinter@v8
         env:
-          # All available variables are described in documentation
-          # https://megalinter.io/configuration/
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} # Validates all source when push on main, else just the git diff with main
+          # Validates all source when push on main, else just the git diff with main
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_LINTERS: PYTHON_BLACK,PYTHON_FLAKE8,PYTHON_ISORT
           PYTHON_FLAKE8_DISABLE_ERRORS_IF_LESS_THAN: 6
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: ./app
+          file: ./app/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.actor }}/star-wars-api:latest
 
