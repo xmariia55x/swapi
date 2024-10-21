@@ -1,5 +1,6 @@
 import requests
-from requests.exceptions import RequestException, HTTPError, Timeout
+from requests.exceptions import HTTPError, RequestException, Timeout
+
 
 class PeopleRepository:
     def __init__(self, api_url: str, logger):
@@ -10,8 +11,10 @@ class PeopleRepository:
         self.logger.info("Calling Star Wars API to get people")
 
         try:
-            response = requests.get(f'{self.api_url}/people/?page={page}', timeout=10) # Add timeout to avoid waiting infinite time
-            response.raise_for_status() # Check if the HTTP status code is 200 OK
+            # Add timeout to avoid waiting infinite time
+            response = requests.get(f"{self.api_url}/people/?page={page}", timeout=10)
+            # Check if the HTTP status code is 200 OK
+            response.raise_for_status()
         except HTTPError as http_err:
             error_message = f"HTTP error occurred: {http_err}"
             self.logger.error(error_message)
@@ -21,13 +24,13 @@ class PeopleRepository:
             self.logger.error(error_message)
             raise Exception(error_message)
         except RequestException as req_err:
-            error_mesage = f"Error during requests to API: {req_err}"
+            error_message = f"Error during requests to API: {req_err}"
             self.logger.error(error_message)
             raise Exception(error_message)
 
         try:
             return response.json()
         except ValueError as json_err:
-            error_mesage = f"JSON decoding failed: {json_err}"
+            error_message = f"JSON decoding failed: {json_err}"
             self.logger.error(error_message)
             raise Exception(error_message)

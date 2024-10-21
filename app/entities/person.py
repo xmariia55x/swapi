@@ -1,5 +1,23 @@
 class Person:
-    def __init__(self, name: str, height: str, mass: str, hair_color: str, skin_color: str, eye_color: str, birth_year: str, gender: str, homeworld: str, films: list, species: list, vehicles: list, starships: list, created: str, edited: str, url: str):
+    def __init__(
+        self,
+        name: str,
+        height: str,
+        mass: str,
+        hair_color: str,
+        skin_color: str,
+        eye_color: str,
+        birth_year: str,
+        gender: str,
+        homeworld: str,
+        films: list,
+        species: list,
+        vehicles: list,
+        starships: list,
+        created: str,
+        edited: str,
+        url: str,
+    ):
         self.name = name
         self.height = height
         self.mass = mass

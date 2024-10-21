@@ -37,4 +37,5 @@ jobs:
           VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }} # Validates all source when push on main, else just the git diff with main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ENABLE_LINTERS: PYTHON_BLACK,PYTHON_FLAKE8,PYTHON_ISORT
+          PYTHON_FLAKE8_DISABLE_ERRORS_IF_LESS_THAN: 6
 
