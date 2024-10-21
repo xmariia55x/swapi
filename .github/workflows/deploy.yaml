@@ -6,50 +6,80 @@ on:
       - main
 
 jobs:
-  deploy:
+  # deploy:
+
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Set up Python
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: '3.10'
+
+  #     - name: Install dependencies
+  #       run: |
+  #         pip install -r requirements.txt
+  #       working-directory: app
+
+  #     - name: Run tests
+  #       run: |
+  #         pytest
+  #       working-directory: app
+
+  #     - name: Lint code using MegaLinter
+  #       uses: oxsecurity/megalinter@v8
+  #       env:
+  #         # Validates all source when push on main, else just the git diff with main
+  #         VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         ENABLE_LINTERS: PYTHON_BLACK,PYTHON_FLAKE8,PYTHON_ISORT
+  #         PYTHON_FLAKE8_DISABLE_ERRORS_IF_LESS_THAN: 6
+
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v3
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
+
+  #     - name: Build and push Docker image
+  #       uses: docker/build-push-action@v3
+  #       with:
+  #         context: ./app
+  #         file: ./app/Dockerfile
+  #         push: true
+  #         tags: ghcr.io/${{ github.actor }}/star-wars-api:latest
+
+  performance: 
 
     runs-on: ubuntu-latest
 
-    steps:
+    services:
+      star-wars-api:
+        image: ghcr.io/${{ github.actor }}/star-wars-api:latest
+        ports:
+          - 5000:5000
+
+    steps: 
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
+      - name: Wait for service to be ready
         run: |
-          pip install -r requirements.txt
-        working-directory: app
+          until curl --silent http://localhost:5000/people/; do
+            echo "Waiting for the app to be up..."
+            sleep 5
+          done
 
-      - name: Run tests
-        run: |
-          pytest
-        working-directory: app
+      - name: Confirm service is up
+        run: curl http://localhost:5000/people/
 
-      - name: Lint code using MegaLinter
-        uses: oxsecurity/megalinter@v8
-        env:
-          # Validates all source when push on main, else just the git diff with main
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ENABLE_LINTERS: PYTHON_BLACK,PYTHON_FLAKE8,PYTHON_ISORT
-          PYTHON_FLAKE8_DISABLE_ERRORS_IF_LESS_THAN: 6
-
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+      - name: Run K6 local test
+        uses: grafana/k6-action@v0.3.1
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          filename: load-tests/star-wars-api-test.js
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v3
-        with:
-          context: ./app
-          file: ./app/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.actor }}/star-wars-api:latest
 
