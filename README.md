@@ -47,8 +47,26 @@ And this will create the necessary Kubernetes resources to start the application
 
 You can execute `kubectl get pods` to verify that a pod was created and create a port-forward to start making requests to the API with this command `kubectl port-forward pod/<pod-name> 5000:5000` 
 
+To remove the Kubernetes resources you only need to run `helm uninstall star-wars-api` and it will remove the chart from the Kubernetes cluster. 
+
 ## CI/CD workflow
 
 In order to ensure that the continous delivery and deployment of the application is made according to the best practices, a workflow has been created to ensure that the code complies with the best standards. 
 
-This workflow is in charge of running the tests, linting the code using MegaLinter a powerful set of linters with minimal configuration, logging into the GitHub Container Registry that is where the docker container will be stored and then building and pushing the Docker image to the registry. 
+This workflow is in charge of running the tests, linting the code using MegaLinter a powerful set of linters with minimal configuration, logging into the GitHub Container Registry that is where the docker container will be stored and then building and pushing the Docker image to the registry. It also runs performance tests using K6. 
+
+## Performance tests
+
+### How to run them
+
+When you make a push to the main branch of this repository, you will see that a new action is triggered. In that action the performance tests are executed using K6's GitHub action. In case you want to run the performance tests in your computer, make sure to have K6 installed using the instructions provided in [this page](https://grafana.com/docs/k6/latest/set-up/install-k6/). 
+
+To execute the tests, you just need to run this command `k6 run load-tests/star-wars-api-test.js` from the root directory of the project.
+
+### How to interpret the results
+
+In this case I have defined a metric that tests the successful requests: ['rate>0.95']. This metric requires at least 95% of the requests to be successful during a load test.
+
+Interpretation:
+- If more than 95% of requests succeed, the system handles the load.
+- If less than 95%, the system fails to manage the load and needs optimization.
